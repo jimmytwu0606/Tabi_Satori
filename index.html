@@ -1108,6 +1108,301 @@
 }
 
 
+/* 學習區容器：允許垂直滾動 */
+#learning-content-area {
+    padding: 20px;
+    overflow-y: auto; /* 🔥 內容太長時自動出現卷軸 */
+    height: 100%;     /* 填滿父容器 */
+    box-sizing: border-box;
+}
+
+/* 測驗卡片 */
+.quiz-card {
+    background: #fff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* --- 🎨 Tabi-Satori V4 核心美學 --- */
+:root {
+    --nhk-green: #27ae60;
+    --nhk-light: #e8f5e9;
+    --text-dark: #2c3e50;
+    --card-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* 內容卡片主體 */
+.content-card {
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 學習區塊通用樣式 */
+.learning-section {
+    background: #fff;
+    margin-bottom: 25px;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    transition: transform 0.2s;
+}
+
+.section-title {
+    font-size: 16px;
+    color: var(--nhk-green);
+    border-bottom: 2px solid var(--nhk-light);
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 📚 文章閱讀區 */
+.article-body {
+    font-size: 20px;
+    line-height: 2.2; /* 增加行高讓 Ruby 不會擠在一起 */
+    color: var(--text-dark);
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; /* 日文教科書字體 */
+    text-align: justify;
+}
+
+/* 優化 Ruby 標註 */
+ruby { ruby-align: center; }
+rt { font-size: 0.5em; color: #7f8c8d; user-select: none; }
+
+
+/* ⚔️ 測驗區塊 */
+.quiz-card {
+    background: #fffcf5;
+    border: 1px solid #f1c40f;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+.quiz-question { font-weight: bold; margin-bottom: 10px; color: #2c3e50; }
+.quiz-options { display: grid; gap: 8px; }
+.quiz-btn {
+    background: #fff; border: 1px solid #ddd; padding: 10px;
+    border-radius: 6px; text-align: left; cursor: pointer; transition: 0.2s;
+    font-size: 14px;
+}
+.quiz-btn:hover { background: #fdf2e9; border-color: #f39c12; }
+.quiz-btn.correct { background: #d5f5e3; border-color: #2ecc71; color: #006400; }
+.quiz-btn.wrong { background: #fadbd8; border-color: #e74c3c; color: #721c24; }
+
+
+/* --- 🔊 語音互動卡片系統 --- */
+
+/* 通用學習卡片 (單字 & 片語共用) */
+.learning-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02); /* 輕微陰影 */
+    border: 1px solid #f0f0f0;
+    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer; /* 讓游標變手型，提示可點擊 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* 滑鼠懸停特效：浮起 + 加深陰影 */
+.learning-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+/* 點擊特效：輕微下壓 */
+.learning-card:active {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: #fafafa;
+}
+
+/* 🔊 喇叭圖示 (預設淡化，Hover 時變明顯) */
+.card-speaker-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 16px;
+    opacity: 0.1; /* 平常很淡 */
+    transition: 0.3s;
+    filter: grayscale(1);
+}
+.learning-card:hover .card-speaker-icon {
+    opacity: 1; /* Hover 時顯現 */
+    filter: grayscale(0);
+    transform: scale(1.1);
+}
+
+/* --- 📕 單字卡專屬樣式 --- */
+.vocab-card-style {
+    border-left: 5px solid var(--nhk-green); /* 左側綠條 */
+}
+.vocab-card-style:hover {
+    border-color: #2ecc71;
+    background: linear-gradient(to right, #f0f9f4, #fff);
+}
+.vocab-word { 
+    font-size: 20px; 
+    font-weight: 800; 
+    color: #2c3e50; 
+    margin-bottom: 2px;
+}
+.vocab-kana { 
+    font-size: 12px; 
+    color: #7f8c8d; 
+    margin-bottom: 6px; 
+    font-family: sans-serif;
+}
+.vocab-meaning { 
+    font-size: 14px; 
+    color: #d35400; 
+    border-top: 1px dashed #eee; 
+    padding-top: 6px; 
+    margin-top: 2px;
+}
+
+/* --- 📘 片語卡專屬樣式 --- */
+.phrase-card-style {
+    border-left: 5px solid #3498db; /* 左側藍條 */
+    padding: 18px; /* 片語通常較長，增加內距 */
+}
+.phrase-card-style:hover {
+    border-color: #2980b9;
+    background: linear-gradient(to right, #f0f8ff, #fff);
+}
+.phrase-content {
+    font-size: 16px;
+    font-weight: bold;
+    color: #2c3e50;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+.phrase-meaning {
+    font-size: 13px;
+    color: #555;
+    background: rgba(0,0,0,0.03);
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* --- ✍️ V4 隨堂測驗美學 (互動修復版) --- */
+
+.quiz-card-v4 {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    transition: transform 0.2s;
+}
+
+.quiz-question-v4 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    line-height: 1.6;
+    border-left: 4px solid var(--accent-orange);
+    padding-left: 12px;
+}
+
+/* 選項按鈕容器 */
+.quiz-options-grid {
+    display: grid;
+    gap: 10px;
+}
+
+/* 選項按鈕本體 */
+.quiz-opt-btn {
+    width: 100%;
+    text-align: left;
+    background: #fcfcfc;
+    border: 2px solid #eee;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+/* 懸停與選中特效 */
+.quiz-opt-btn:hover {
+    background: #fff8e1;
+    border-color: #f1c40f;
+}
+
+.quiz-opt-btn.selected {
+    background: #fff3cd;
+    border-color: #f1c40f;
+    color: #856404;
+    font-weight: bold;
+    box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.2);
+}
+
+/* ✅ 正確答案樣式 */
+.quiz-opt-btn.correct {
+    background: #d4edda !important;
+    border-color: #28a745 !important;
+    color: #155724 !important;
+}
+.quiz-opt-btn.correct::after {
+    content: "✅";
+    position: absolute;
+    right: 15px;
+}
+
+/* ❌ 錯誤答案樣式 */
+.quiz-opt-btn.wrong {
+    background: #f8d7da !important;
+    border-color: #dc3545 !important;
+    color: #721c24 !important;
+    opacity: 0.7;
+}
+.quiz-opt-btn.wrong::after {
+    content: "❌";
+    position: absolute;
+    right: 15px;
+}
+
+/* 解析區塊 */
+.quiz-explain-box {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f0f7ff;
+    border-left: 4px solid #3498db;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #2c3e50;
+    line-height: 1.6;
+    display: none; /* 預設隱藏 */
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 </style>
 
@@ -1219,64 +1514,54 @@
 
 <div class="main-wrapper">
         <main class="content-card">
-            <h1 class="article-title" id="article-title-display">歡迎來到 Tabi-Satori V4</h1>
-            
-            <div style="display:flex; gap:15px; margin-bottom:30px;">
-                <button class="btn-nhk" onclick="speakTextFromId('article-view')">🔊 読み上げ</button>
-                <button class="btn-nhk" id="toggle-ruby" onclick="toggleRuby()">漢字の読み方を消す</button>
-                <button class="btn-nhk" style="background: var(--nhk-green); color: white; border-color: var(--nhk-green);" onclick="openFlashcards()">🗂️ 複習中心</button>
+    
+    <div style="padding: 20px 20px 0 20px;">
+        <h1 class="article-title" id="article-title-display" style="margin: 0 0 15px 0; font-size: 24px;">歡迎來到 Tabi-Satori V4</h1>
+        
+        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap: wrap;">
+            <button class="btn-nhk" onclick="speakTextFromId('learning-content-area')">🔊 朗讀本文</button>
+            <button class="btn-nhk" id="toggle-ruby" onclick="document.body.classList.toggle('hide-ruby')">漢字の読み方を消す</button>
+            <button class="btn-nhk" style="background: var(--nhk-green); color: white; border-color: var(--nhk-green);" onclick="openFlashcards()">🗂️ 複習中心</button>
+        </div>
+    </div>
+
+    <div style="flex: 1; overflow-y: auto; padding: 0 20px 20px 20px; scroll-behavior: smooth;">
+        
+        <div id="welcome-screen" style="text-align: center; padding: 40px 0;">
+            <div style="font-size: 80px; margin-bottom: 20px; animation: float 3s infinite ease-in-out;">🏰</div>
+            <p style="color: #7f8c8d; font-size: 16px; line-height: 1.6;">
+                這裡是知識的起點。<br>請從右側注入 <b>燃料包 (JSON)</b> 以展開冒險。
+            </p>
+        </div>
+
+        <div id="learning-content-area" style="display: none;">
             </div>
 
-            <div class="article-body" id="article-view">
-                請從右側注入燃料包以開始學習與冒險。
-            </div>
+    </div>
 
-            <div class="study-box">
-                <h3 style="margin:0 0 15px 0; color: var(--nhk-green);">📌 重點學習筆記</h3>
-                <div id="vocab-display" class="vocab-grid"></div>
-                <div id="phrase-display" class="phrase-section" style="display:none; margin-top:20px;">
-                    <strong style="display:block; margin-bottom:10px;">💡 實用片語 / 文法</strong>
-                    <div id="phrase-list"></div>
-                </div>
-            </div>
+    <div id="flashcard-hub" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%; background: #fff; z-index: 50; flex-direction: column;">
+        <div style="padding: 15px; border-bottom: 1px solid #eee; display:flex; justify-content:space-between; align-items:center; background: #f9f9f9;">
+            <h2 style="margin:0; font-size: 18px;">🗂️ 智能複習中心</h2>
+            <button onclick="closeFlashcards()" style="background:none; border:none; font-size: 18px; cursor:pointer;">✕</button>
+        </div>
+        <div style="flex:1; overflow-y: auto; padding: 20px;">
+            <div id="vocab-card-section"><div id="vocab-flashcard-container" class="vocab-grid"></div></div>
+        </div>
+    </div>
 
-            <div id="quiz-section" class="study-box" style="display:none; border-color: var(--accent-orange); background: #fffcf5; margin-top: 30px;">
-                <h3 style="color: var(--accent-orange); margin-top:0;">✍️ 實力測驗</h3>
-                <div id="quiz-container"></div>
-                <button class="action-btn" id="submit-quiz" onclick="checkQuiz()" style="background: var(--accent-orange); margin-top:20px;">
-                    提交答案 (答えを出す)
-                </button>
-            </div>
-
-            <div id="flashcard-hub" style="display:none;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; border-bottom: 2px solid var(--nhk-green); padding-bottom: 10px;">
-                    <h2 style="margin:0;">🗂️ 智能複習中心</h2>
-                    <button onclick="closeFlashcards()" style="background:#f44336; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">退出 ✕</button>
-                </div>
-
-                <div style="background:#eee; border-radius:10px; height:12px; margin-bottom:10px; overflow:hidden;">
-                    <div id="review-progress-bar" style="width: 0%; height:100%; background: var(--nhk-green); transition: width 0.5s;"></div>
-                </div>
-                <div id="review-status-text" style="font-size:12px; color:#666; margin-bottom:20px; text-align:right;">進度：0 / 0 (0%)</div>
-                
-                <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-                    <select id="card-mode" onchange="loadFlashcards()"><option value="jp">日文 (原文)</option><option value="ch">中文 (翻譯)</option></select>
-                    <select id="card-limit" onchange="loadFlashcards()"><option value="10">10 筆</option><option value="20">20 筆</option><option value="0">全部</option></select>
-                    <button onclick="loadFlashcards()" class="btn-nhk" style="padding:5px 15px;">🔄 換一組</button>
-                </div>
-
-                <div id="vocab-card-section">
-                    <h3 style="border-left: 4px solid var(--nhk-green); padding-left: 10px;">📕 生字專區</h3>
-                    <div id="vocab-flashcard-container" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:15px;"></div>
-                </div>
-                <div id="phrase-card-section" style="margin-top: 30px;">
-                    <h3 style="border-left: 4px solid var(--accent-orange); padding-left: 10px;">📘 片語專區</h3>
-                    <div id="phrase-flashcard-container" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:15px;"></div>
-                </div>
-            </div>
-        </main>
+</main>
 
         <aside>
+
+            <div class="side-module">
+                <div class="side-header">⚙️ 語音速度</div>
+                <div class="side-content">
+                    <input type="range" id="speed-range" min="0.5" max="1.5" step="0.1" value="1.0" style="width:100%;">
+                    <div id="speed-label" style="text-align:center; font-weight:bold;">1.0x</div>
+                </div>
+            </div>
+
+
             <div class="side-module cloud-side-box">
                 <div class="side-header">
                     <span>🌐 系統雲端狀態</span>
@@ -1341,34 +1626,6 @@
     </div>
 </div>
 
-
-<div class="side-module">
-    <div class="side-header" style="background: linear-gradient(90deg, #2c3e50, #4ca1af); color: white;">
-        📰 AI 新聞轉譯機
-    </div>
-    <div class="side-content">
-        <div style="display:flex; gap:5px; margin-bottom:5px;">
-            <select id="news-level" style="flex:1; padding:5px; border:1px solid #ddd; border-radius:4px;">
-                <option value="N5">N5 (入門)</option>
-                <option value="N4">N4 (初級)</option>
-                <option value="N3">N3 (中級)</option>
-                <option value="N2">N2 (上級)</option>
-                <option value="N1">N1 (深淵)</option>
-            </select>
-        </div>
-        <textarea id="news-input" placeholder="請在此貼上日文新聞原文..." style="width:100%; height:60px; box-sizing:border-box; margin-bottom:5px; font-size:11px;"></textarea>
-        
-        <button class="action-btn" onclick="copyNewsPrompt()" style="background: #e67e22; font-size: 12px;">
-            📋 複製 AI 指令 (Copy Prompt)
-        </button>
-        <div style="font-size:9px; color:#999; margin-top:5px; text-align:center;">
-            複製後貼給 ChatGPT/Gemini，再將生成的 JSON 貼回下方注入區。
-        </div>
-    </div>
-</div>
-
-
-
             <div id="intel-panel" class="side-module" style="display:none; border: 2px solid var(--nhk-green);">
                 <div class="side-header" style="background: var(--nhk-light-green); display: flex; justify-content: space-between;">
                     <span>📡 戰前情報</span>
@@ -1401,6 +1658,33 @@
                 </div>
             </div>
 
+
+<div class="side-module">
+    <div class="side-header" style="background: linear-gradient(90deg, #2c3e50, #4ca1af); color: white;">
+        📰 AI 新聞轉譯機
+    </div>
+    <div class="side-content">
+        <div style="display:flex; gap:5px; margin-bottom:5px;">
+            <select id="news-level" style="flex:1; padding:5px; border:1px solid #ddd; border-radius:4px;">
+                <option value="N5">N5 (入門)</option>
+                <option value="N4">N4 (初級)</option>
+                <option value="N3">N3 (中級)</option>
+                <option value="N2">N2 (上級)</option>
+                <option value="N1">N1 (深淵)</option>
+            </select>
+        </div>
+        <textarea id="news-input" placeholder="請在此貼上日文新聞原文..." style="width:100%; height:60px; box-sizing:border-box; margin-bottom:5px; font-size:11px;"></textarea>
+        
+        <button class="action-btn" onclick="copyNewsPrompt()" style="background: #e67e22; font-size: 12px;">
+            📋 複製 AI 指令 (Copy Prompt)
+        </button>
+        <div style="font-size:9px; color:#999; margin-top:5px; text-align:center;">
+            複製後貼給 ChatGPT/Gemini，再將生成的 JSON 貼回下方注入區。
+        </div>
+    </div>
+</div>
+
+
             <div class="side-module">
                 <div class="side-header">📚 我的文章庫</div>
                 <div class="side-content" id="history-list" style="max-height: 300px; overflow-y: auto;"></div>
@@ -1410,14 +1694,11 @@
                 <button class="game-btn" onclick="cleanUpFuelPacks()" style="width: 100%; background: #95a5a6; font-size: 11px;">🧹 整理重複章節</button>
             </div>
             
-            <div class="side-module">
-                <div class="side-header">⚙️ 語音速度</div>
-                <div class="side-content">
-                    <input type="range" id="speed-range" min="0.5" max="1.5" step="0.1" value="1.0" style="width:100%;">
-                    <div id="speed-label" style="text-align:center; font-weight:bold;">1.0x</div>
-                </div>
-            </div>
+
         </aside>
+
+
+
     </div>
 
 
@@ -8510,33 +8791,37 @@ async function injectFuel() {
         let rawData = JSON.parse(inputField.value);
         let target = Array.isArray(rawData) ? rawData[0] : rawData;
 
-        // 1. 🔥 【結構解鎖】萬能對齊層
+        // 1. 🔥 【結構解鎖】萬能對齊層 (相容多種 JSON 格式)
         const source = target.content || target; 
         const meta = target.metadata || {};
 
         const standardPack = {
             name: cleanRuby(target.name || target.packet_id || meta.tactical_note || "未命名冒險章節"),
             difficulty: (meta.level || target.difficulty || (target.name ? (target.name.match(/N[0-5]/i) || ["N5"])[0] : "N5")).toUpperCase(),
-            notes: cleanRuby(source.article || target.notes || "無描述內容"),
+            article: cleanRuby(source.article || target.notes || "無描述內容"), // 統一用 article
             
+            // 單字處理 (支援 vocab, glossary)
             vocab: (source.glossary || source.vocab || target.vocab || []).map(v => ({
-                w: cleanRuby(v.term || v.w || "未知"),
-                m: v.logic || v.m || v.ruby || "意義待考",
-                e1: cleanRuby(v.e1 || v.example || v.ex1 || ""),
-                e2: cleanRuby(v.e2 || v.ex2 || "")
+                word: cleanRuby(v.word || v.w || v.term || "未知"),
+                kana: cleanRuby(v.kana || v.k || ""), // 新增假名欄位
+                meaning: cleanRuby(v.meaning || v.m || v.logic || "意義待考"),
+                // 保留舊格式以便相容
+                w: cleanRuby(v.word || v.w || v.term || "未知"), 
+                m: cleanRuby(v.meaning || v.m || v.logic || "意義待考")
             })),
             
+            // 片語處理
             phrases: (source.phrases || target.phrases || []).map(p => ({
-                jp: cleanRuby(p.jp || ""),
-                ch: p.ch || ""
+                phrase: cleanRuby(p.phrase || p.jp || ""),
+                meaning: cleanRuby(p.meaning || p.ch || "")
             })),
             
-            exam: (source.quiz || source.exam || target.exam || []).map(q => ({
-                q: cleanRuby(q.q || q.question || ""),
-                o: (q.options || q.o || ["選項 A", "選項 B", "選項 C", "選項 D"]).map(opt => cleanRuby(opt)),
-                a: q.answer !== undefined ? Number(q.answer) : (q.a !== undefined ? Number(q.a) : 0),
-                type: q.type || "grammar",
-                explain: q.explain || q.logic || "注意語法應用與語境。"
+            // 測驗處理 (支援 quiz, exam)
+            quiz: (source.quiz || source.exam || target.exam || []).map(q => ({
+                question: cleanRuby(q.question || q.q || ""),
+                options: (q.options || q.o || ["選項 A", "選項 B"]).map(opt => cleanRuby(opt)),
+                answer: (q.answer !== undefined ? q.answer : (q.a || "")), // 支援字串或索引
+                explain: q.explain || ""
             })),
             
             loots: target.loots || [],
@@ -8546,7 +8831,6 @@ async function injectFuel() {
         };
 
         // 2. 🔥 【物理重複偵測引擎】
-        // 在寫入前，物理檢索資料庫內是否存在相同名稱的文章
         const existingPack = await db.fuelPacks.where('name').equals(standardPack.name).first();
         
         if (existingPack) {
@@ -8554,21 +8838,18 @@ async function injectFuel() {
             const choice = confirm(`📜 發現重複章節！\n\n「${standardPack.name}」已存在。\n\n【確定】：物理覆蓋 (更新內容)\n【取消】：平行時空 (新增為複本)`);
             
             if (choice) {
-                // 模式 A：覆蓋。繼承舊 ID 進行更新
                 standardPack.id = existingPack.id;
                 showNotification("♻️ 已物理更新現有章節");
             } else {
-                // 模式 B：新增複本。
                 delete standardPack.id;
                 standardPack.name += ` (複本_${new Date().toLocaleTimeString()})`;
                 showNotification("🌌 已物理開闢平行時空複本");
             }
         } else {
-            // 模式 C：全新注入
             delete standardPack.id;
         }
 
-        // 3. 物理外觀與屬性校準 (維持原邏輯)
+        // 3. 物理外觀與屬性校準
         if (!standardPack.appearance) {
             standardPack.appearance = (typeof getRandomEnemyAppearance === 'function') 
                 ? getRandomEnemyAppearance(standardPack.difficulty) : "👾";
@@ -8580,22 +8861,29 @@ async function injectFuel() {
         }
 
         // 4. 物理安全檢查
-        if (standardPack.vocab.length === 0 && standardPack.exam.length === 0) {
-            throw new Error("燃料包內容空洞，無法驅動學習引擎");
+        if (standardPack.vocab.length === 0 && standardPack.quiz.length === 0) {
+            // 不拋出錯誤，允許純文章模式，但給予警告
+            console.warn("⚠️ 燃料包內容較少 (無單字或測驗)");
         }
 
         // 5. 🔥 【執行注入與持久化】
-        // 使用 put 會根據有無 ID 自動判定是 add 還是 update
         const newId = await db.fuelPacks.put(standardPack);
+        window.currentActivePack = standardPack; // 設定為當前活躍包
 
         // 6. 🔥 【同步渲染】
-        if (typeof displayContent === 'function') displayContent(standardPack);
+        // A. 呼叫新版學習渲染引擎
+        if (typeof renderLearningDetail === 'function') {
+             renderLearningDetail(standardPack);
+        } else {
+             console.error("❌ 找不到 renderLearningDetail 函數，無法顯示內容！");
+        }
         
-        // ✨✨✨ 核心修正：強制同步更新側邊欄情報面板 ✨✨✨
+        // B. 呼叫側邊欄情報更新
         if (typeof updateIntelPanel === 'function') {
             updateIntelPanel(standardPack);
         }
 
+        // C. 更新歷史清單
         if (typeof renderHistoryList === 'function') await renderHistoryList();
 
         // 7. 物理清空並通知
@@ -8745,7 +9033,7 @@ function copyNewsPrompt() {
 1. 嚴格輸出 **純 JSON 格式**，不要包含 markdown (如 \`\`\`json) 或其他廢話。
 2. JSON 結構必須完全符合下方範例。
 3. **Ruby 標註**：所有漢字必須使用 <ruby>漢<rt>かん</rt>字<rt>じ</rt></ruby> 格式。
-4. **單字與考題**：請根據 ${level} 難度，從文中提取 4-6 個重點單字、2-3 個片語，並生成 2 題測驗。
+4. **單字與考題**：請根據 ${level} 難度，從文中提取 10-12 個重點單字、6-8 個片語，並生成 10 題測驗。
 5. **考題邏輯**：
    - "vocab": 選出正確讀音。
    - "grammar": 選出正確文法接續或含義。
@@ -8787,6 +9075,140 @@ function copyNewsPrompt() {
         showNotification("❌ 複製失敗，請手動選取複製。");
     });
 }
+
+/**
+ * 🎓 學習內容渲染引擎 (V4 物理加固版)
+ * 修正：innerHTML 支援 Ruby 標題、對齊 V4 測驗按鈕邏輯、解決 Header 遮擋位移
+ */
+function renderLearningDetail(fuelPack) {
+    const container = document.getElementById('learning-content-area');
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const titleDisplay = document.getElementById('article-title-display');
+
+    if (!container) return;
+
+    // 1. 🔥 【物理狀態切換】
+    if (welcomeScreen) welcomeScreen.style.display = 'none';
+    container.style.display = 'block';
+
+    // 2. 🔥 【標題渲染修正】將 innerText 改為 innerHTML，確保 Ruby 正常顯示
+    if (titleDisplay) {
+        titleDisplay.innerHTML = fuelPack.name || "未命名章節";
+        titleDisplay.style.lineHeight = "2.2"; // 給予足夠空間放置假名
+    }
+
+    // 3. 🔥 【測驗數據初始化】物理鎖定正確答案
+    window.currentQuizState = {
+        answers: (fuelPack.quiz || fuelPack.exam || []).map(q => Number(q.answer !== undefined ? q.answer : q.a)),
+        userSelect: {}
+    };
+
+    let html = '';
+
+    // --- A. 📚 本文區塊 ---
+    if (fuelPack.article || fuelPack.notes) {
+        html += `
+            <div class="learning-section">
+                <div class="section-title">📚 本文 (Article)</div>
+                <div class="article-body">
+                    ${fuelPack.article || fuelPack.notes}
+                </div>
+            </div>
+        `;
+    }
+
+    // --- B. 🗝️ 單字區塊 (卡片化 + 朗讀) ---
+    if (fuelPack.vocab && fuelPack.vocab.length > 0) {
+        html += `
+            <div class="learning-section">
+                <div class="section-title">🗝️ 必修單字 (Vocabulary)</div>
+                <div class="vocab-grid">
+        `;
+        fuelPack.vocab.forEach(v => {
+            const wordText = v.word || v.w;
+            const meaningText = v.meaning || v.m;
+            html += `
+                <div class="learning-card vocab-card-style" onclick="speakText('${wordText}')">
+                    <div class="card-speaker-icon">🔊</div>
+                    <div class="vocab-word">${wordText}</div>
+                    ${v.kana ? `<div class="vocab-kana">${v.kana}</div>` : ''}
+                    <div class="vocab-meaning">${meaningText}</div>
+                </div>
+            `;
+        });
+        html += `</div></div>`;
+    }
+
+    // --- C. 💬 片語區塊 (Grid 佈局) ---
+    if (fuelPack.phrases && fuelPack.phrases.length > 0) {
+        html += `
+            <div class="learning-section">
+                <div class="section-title">💬 實用片語 (Phrases)</div>
+                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px;">
+        `;
+        fuelPack.phrases.forEach(p => {
+            const jpText = p.phrase || p.jp;
+            const chText = p.meaning || p.ch;
+            html += `
+                <div class="learning-card phrase-card-style" onclick="speakText('${jpText}')">
+                    <div class="card-speaker-icon">🔊</div>
+                    <div class="phrase-content">${jpText}</div>
+                    <div><span class="phrase-meaning">👉 ${chText}</span></div>
+                </div>
+            `;
+        });
+        html += `</div></div>`;
+    }
+
+    // --- D. ⚔️ 測驗區塊 (V4 按鈕與邏輯導正版) ---
+    const exams = fuelPack.quiz || fuelPack.exam;
+    if (exams && exams.length > 0) {
+        html += `
+            <div class="learning-section" id="quiz-section" style="border-color: #f1c40f;">
+                <div class="section-title" style="color: #f39c12;">⚔️ 隨堂測驗 (Battle)</div>
+                <div id="quiz-container">
+        `;
+        
+        exams.forEach((q, index) => {
+            const qText = q.question || q.q;
+            const options = q.options || q.o;
+            html += `
+                <div class="quiz-card-v4" id="quiz-block-${index}">
+                    <div class="quiz-question-v4">Q${index + 1}. ${qText}</div>
+                    <div class="quiz-options-grid" id="options-group-${index}">
+                        ${options.map((opt, i) => `
+                            <button type="button" class="quiz-opt-btn" onclick="selectQuizOption(${index}, ${i})">
+                                <span style="opacity:0.5; margin-right:8px; font-family:monospace;">${['A','B','C','D'][i]}</span>
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="explain-${index}" class="quiz-explain-box">
+                        <strong style="color:#2980b9;">💡 物理解析：</strong><br>${q.explain || '本題考驗當前等級的核心概念。'}
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+                <button id="submit-quiz" class="action-btn" onclick="checkQuiz()" 
+                        style="background:var(--accent-orange); margin-top:20px; box-shadow: 0 4px 0 #d35400;">
+                    提交答案 (答えを出す)
+                </button>
+            </div>
+        `;
+    }
+
+    // 4. 🔥 【DOM 物理注入與捲動回收】
+    container.innerHTML = html;
+    
+    // 解決穿透與位移：確保捲動行為鎖定在主內容區
+    setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
+}
+
 
 
 /**
@@ -15341,209 +15763,331 @@ function dropEquipment(quality) {
         document.getElementById('player-status-bar').appendChild(btn);
     }
 
-// --- 2. 核心：渲染內容到畫面 (導入 Ruby 物理校準與排版修正) ---
+/**
+ * 🎨 核心渲染引擎：主控台 (分流處理)
+ */
 function displayContent(target) {
-    // 🔥 【物理修正：標題清洗】防止標題內的 Ruby 標籤因換行導致位移
-    // 我們物理性地移除標題字串中可能的換行符，確保渲染結構穩定
-    const cleanTitle = (target.name || "未命名章節").replace(/\n/g, "").trim();
-    const titleEl = document.getElementById('article-title-display');
-    if (titleEl) {
-        titleEl.innerHTML = cleanTitle;
-        // 確保標題行高足夠放置假名
-        titleEl.style.lineHeight = "2.2"; 
-    }
+    if (!target) return;
 
-    // 渲染主文章內容
-    const articleView = document.getElementById('article-view');
-    if (articleView) {
-        articleView.innerHTML = target.notes || "";
-        // 強制注入行高保護，防止假名重疊
-        articleView.style.lineHeight = "2.8";
-    }
-    
-    // B. 渲染重點單字與例句
-    const vDisplay = document.getElementById('vocab-display');
-    if (vDisplay) {
-        vDisplay.innerHTML = '';
-        if(target.vocab) {
-            target.vocab.forEach(v => {
-                const card = document.createElement('div');
-                card.className = 'vocab-card';
-                // 🔥 物理強化：確保卡片容器具備足夠行高
-                card.style.lineHeight = "2.4";
-                card.style.overflow = "visible"; // 確保假名不會被切掉
+    // 1. 渲染文章頭部與內文
+    renderArticle(target);
 
-                card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 8px;">
-                        <strong style="font-size: 1.2em;">${v.w}</strong> 
-                        <span style="font-size:12px; color:var(--nhk-green); cursor:pointer;">點擊發音 🔊</span>
-                    </div>
-                    <div style="font-size:14px; color:#333; margin:8px 0; background: #fcfcfc; padding: 4px;">${v.m}</div>
-                    <div class="example-text" style="line-height: 2.2;">① ${v.e1}</div>
-                    <div class="example-text" style="line-height: 2.2;">② ${v.e2}</div>
-                `;
-                
-                card.onclick = () => {
-                    const cleanHTML = (str) => {
-                        const temp = document.createElement("div");
-                        temp.innerHTML = str;
-                        temp.querySelectorAll("rt").forEach(rt => rt.remove());
-                        return temp.innerText;
-                    };
-                    speakRawText(`${cleanHTML(v.w)}。意味：${v.m}。例句一：${cleanHTML(v.e1)}。例句二：${cleanHTML(v.e2)}`);
-                };
-                vDisplay.appendChild(card);
-            });
-        }
-    }
+    // 2. 渲染單字卡 (Vocab)
+    renderVocabulary(target);
 
-    // C. 渲染片語
-    const pDisplay = document.getElementById('phrase-display');
-    const pList = document.getElementById('phrase-list');
-    if(pList) {
-        if(target.phrases && target.phrases.length > 0) {
-            pDisplay.style.display = 'block';
-            pList.innerHTML = target.phrases.map(p => {
-                const cleanJP = p.jp.replace(/<rt>.*?<\/rt>|<[^>]+>/g, "");
-                return `
-                    <div class="phrase-item" onclick="speakRawText('${cleanJP}')" style="cursor:pointer; padding: 8px 0; border-bottom: 1px dotted #ccc; line-height: 2.4;">
-                        <strong>● ${p.jp}</strong>：${p.ch} <span style="font-size:12px;">🔊</span>
-                    </div>
-                `;
-            }).join('');
-        } else {
-            pDisplay.style.display = 'none';
-        }
-    }
+    // 3. 渲染片語列 (Phrases)
+    renderPhrases(target);
 
-    // D. 渲染測驗 (Exam) - 增加 CSS 隔離防止假名跑版
-    const quizSection = document.getElementById('quiz-section');
-    const quizContainer = document.getElementById('quiz-container');
-    const submitBtn = document.getElementById('submit-quiz');
+    // 4. 渲染測驗區 (Exam) - V4 按鈕互動版
+    renderQuizSection(target);
 
-    if (quizContainer) {
-        if (target.exam && target.exam.length > 0) {
-            quizSection.style.display = 'block';
-            submitBtn.style.display = 'block';
-            quizContainer.innerHTML = ''; 
-
-            target.exam.forEach((item, index) => {
-                const qDiv = document.createElement('div');
-                qDiv.id = `q-block-${index}`;
-                qDiv.style = "margin-bottom: 25px; padding: 20px; background: white; border-radius: 12px; border: 1px solid #ffe58f; line-height: 2.6;";
-                
-                const typeLabel = { 'vocab': '【語彙】', 'grammar': '【文法】', 'reading': '【讀解】' };
-                
-                qDiv.innerHTML = `
-                    <div style="font-weight:bold; margin-bottom:15px; color:#856404; font-size: 1.1em;">
-                        ${typeLabel[item.type] || ''} Q${index + 1}. ${item.q}
-                    </div>
-                    <div style="display:grid; gap:12px;">
-                        ${item.o.map((opt, i) => `
-                            <label style="display:flex; align-items:center; gap:12px; cursor:pointer; padding:12px; border-radius:8px; background: #fffdf5; border: 1px solid #fff5d7; transition: 0.2s;">
-                                <input type="radio" name="q${index}" value="${i}" style="transform: scale(1.2);"> 
-                                <span style="line-height: 2.2;">${opt}</span>
-                            </label>
-                        `).join('')}
-                    </div>
-                    <div id="explain-${index}" style="display:none; margin-top:20px; padding:15px; background:#f0f7ff; border-left:5px solid #3498db; font-size:14px; color:#2c3e50; border-radius: 4px;">
-                        <strong style="color:#2980b9;">💡 物理解析：</strong><br>${item.explain || '本題考驗語法邏輯與詞彙運用。'}
-                    </div>
-                `;
-                quizContainer.appendChild(qDiv);
-            });
-            window.currentAnswers = target.exam.map(item => item.a);
-        } else {
-            quizSection.style.display = 'none';
-        }
-    }
-    
-    // 物理平滑置頂，讓玩家從頭開始閱讀
+    // 5. 物理平滑置頂
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 
+function renderVocabulary(target) {
+    const vDisplay = document.getElementById('vocab-display');
+    if (!vDisplay) return;
+
+    vDisplay.innerHTML = '';
+    
+    if (target.vocab && target.vocab.length > 0) {
+        target.vocab.forEach(v => {
+            const card = document.createElement('div');
+            card.className = 'vocab-card';
+            card.style.lineHeight = "2.4";
+            card.style.overflow = "visible"; 
+
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 8px;">
+                    <strong style="font-size: 1.2em;">${v.w}</strong> 
+                    <span style="font-size:12px; color:var(--nhk-green); cursor:pointer;">點擊發音 🔊</span>
+                </div>
+                <div style="font-size:14px; color:#333; margin:8px 0; background: #fcfcfc; padding: 4px;">${v.m}</div>
+                <div class="example-text" style="line-height: 2.2;">① ${v.e1}</div>
+                <div class="example-text" style="line-height: 2.2;">② ${v.e2}</div>
+            `;
+            
+            card.onclick = () => {
+                // 物理清洗：移除 Ruby 標籤以供朗讀
+                const cleanHTML = (str) => {
+                    const temp = document.createElement("div");
+                    temp.innerHTML = str;
+                    temp.querySelectorAll("rt").forEach(rt => rt.remove());
+                    return temp.innerText;
+                };
+                speakRawText(`${cleanHTML(v.w)}。意味：${v.m}。例句一：${cleanHTML(v.e1)}。例句二：${cleanHTML(v.e2)}`);
+            };
+            vDisplay.appendChild(card);
+        });
+    }
+}
+
+
+function renderPhrases(target) {
+    const pDisplay = document.getElementById('phrase-display');
+    const pList = document.getElementById('phrase-list');
+    
+    if (!pList || !pDisplay) return;
+
+    if (target.phrases && target.phrases.length > 0) {
+        pDisplay.style.display = 'block';
+        pList.innerHTML = target.phrases.map(p => {
+            const cleanJP = p.jp.replace(/<rt>.*?<\/rt>|<[^>]+>/g, "");
+            return `
+                <div class="phrase-item" onclick="speakRawText('${cleanJP}')" style="cursor:pointer; padding: 8px 0; border-bottom: 1px dotted #ccc; line-height: 2.4;">
+                    <strong>● ${p.jp}</strong>：${p.ch} <span style="font-size:12px;">🔊</span>
+                </div>
+            `;
+        }).join('');
+    } else {
+        pDisplay.style.display = 'none';
+    }
+}
+
+
+function renderQuizSection(target) {
+    const quizSection = document.getElementById('quiz-section');
+    const quizContainer = document.getElementById('quiz-container');
+    const submitBtn = document.getElementById('submit-quiz');
+
+    if (!quizContainer) return;
+
+    // 1. 初始化全域測驗狀態
+    window.currentQuizState = {
+        answers: [],    // 正確答案索引
+        userSelect: {}  // 使用者選擇 { 題目Index: 選項Index }
+    };
+
+    if (target.exam && target.exam.length > 0) {
+        quizSection.style.display = 'block';
+        submitBtn.style.display = 'block';
+        
+        // 重置按鈕狀態
+        submitBtn.disabled = false;
+        submitBtn.innerText = "提交答案 (答えを出す)";
+        submitBtn.style.opacity = "1";
+        submitBtn.style.cursor = "pointer";
+        submitBtn.style.background = "var(--accent-orange)"; // 恢復橘色
+
+        quizContainer.innerHTML = ''; 
+
+        target.exam.forEach((item, index) => {
+            const qDiv = document.createElement('div');
+            // 使用內聯樣式模擬 .quiz-card-v4 (亦可直接用 class)
+            qDiv.style = "background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); position: relative; overflow: hidden;";
+            qDiv.id = `quiz-block-${index}`;
+            
+            const typeLabel = { 'vocab': '【語彙】', 'grammar': '【文法】', 'reading': '【讀解】' };
+            
+            qDiv.innerHTML = `
+                <div style="font-size: 18px; font-weight: bold; color: #2c3e50; margin-bottom: 15px; line-height: 1.6; border-left: 4px solid #f39800; padding-left: 12px;">
+                    ${typeLabel[item.type] || ''} Q${index + 1}. ${item.q}
+                </div>
+                <div id="options-group-${index}" style="display: grid; gap: 10px;">
+                    ${item.o.map((opt, i) => `
+                        <button class="quiz-opt-btn" onclick="selectQuizOption(${index}, ${i})" 
+                                style="width: 100%; text-align: left; background: #fcfcfc; border: 2px solid #eee; padding: 12px 15px; border-radius: 8px; font-size: 16px; color: #555; cursor: pointer; transition: 0.2s; position: relative;">
+                            <span style="margin-right:8px; opacity:0.6;">${['A','B','C','D'][i]}.</span>
+                            ${opt}
+                        </button>
+                    `).join('')}
+                </div>
+                <div id="explain-${index}" style="margin-top: 15px; padding: 15px; background: #f0f7ff; border-left: 4px solid #3498db; border-radius: 4px; font-size: 14px; color: #2c3e50; line-height: 1.6; display: none;">
+                    <strong style="color:#2980b9;">💡 物理解析：</strong><br>${item.explain || '本題考驗語法邏輯與詞彙運用。'}
+                </div>
+            `;
+            quizContainer.appendChild(qDiv);
+        });
+
+        // 物理鎖定：將正確答案存入記憶體
+        window.currentQuizState.answers = target.exam.map(item => Number(item.a)); 
+    } else {
+        quizSection.style.display = 'none';
+    }
+}
+
+
+
 /**
- * ⚔️ 核心：測驗核對邏輯 (整合神話武器：吸血、處決與視覺強化)
+ * 🖱️ 測驗互動：選擇選項 (視覺切換)
+ * 修正：確保 currentQuizState 存在，並正確切換 CSS class
+ */
+function selectQuizOption(qIdx, optIdx) {
+    // 1. 初始化狀態 (防止報錯)
+    if (!window.currentQuizState) {
+        window.currentQuizState = { userSelect: {}, answers: [] };
+    }
+    
+    // 2. 記錄選擇
+    window.currentQuizState.userSelect[qIdx] = optIdx;
+
+    // 3. 更新視覺 (單選邏輯)
+    const group = document.getElementById(`options-group-${qIdx}`);
+    if (group) {
+        const btns = group.querySelectorAll('.quiz-opt-btn');
+        btns.forEach((btn, idx) => {
+            // 移除舊狀態
+            btn.classList.remove('selected');
+            
+            // 為當前點擊的按鈕加上選中狀態
+            if (idx === optIdx) {
+                btn.classList.add('selected');
+            }
+        });
+    }
+}
+
+/**
+ * ⚔️ 核心：測驗核對邏輯 (V4 按鈕適配 + 神話武器特效整合完全體)
+ * 修正：物理 HP 溢出防護、UI 點火鏈路鎖定與視覺回饋導正
  */
 function checkQuiz() {
-    if (!window.currentAnswers) return;
+    // 1. 🔥 【物理狀態安全攔截】
+    const state = window.currentQuizState;
+    if (!state || !state.answers || state.answers.length === 0) {
+        console.error("❌ 物理斷裂：找不到測驗狀態數據池");
+        return;
+    }
 
     let score = 0;
-    const total = window.currentAnswers.length;
-    const bossName = document.getElementById('article-title-display').innerText || "無名魔王";
+    const total = state.answers.length;
+    const submitBtn = document.getElementById('submit-quiz');
+    const articleTitleEl = document.getElementById('article-title-display');
+    const bossName = articleTitleEl ? articleTitleEl.innerText : "自我修練";
 
-    // 🕵️ 物理掃描：檢查玩家是否持有特定神器
+    // 2. 🔥 【物理鎖定】立即禁用提交按鈕，防止異步進程中的二次觸發
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "✨ 批改完成 (Check Completed)";
+        submitBtn.style.opacity = "0.6";
+        submitBtn.style.cursor = "default";
+        submitBtn.style.pointerEvents = "none"; 
+    }
+
+    // 🕵️ 物理掃描：檢查玩家是否持有特定神話裝備
     const inv = player.inventory || [];
     const hasScepter = inv.includes("💀 審判者的血腥權杖");
     const hasBlade = inv.includes("🗡️ 統治者之鋒");
 
-    window.currentAnswers.forEach((correctIdx, qIdx) => {
-        const selected = document.querySelector(`input[name="q${qIdx}"]:checked`);
-        const questionDiv = document.getElementsByName(`q${qIdx}`)[0]?.closest('div')?.parentElement;
+    // 3. 🔥 【核心演算】遍歷每一題執行物理判定與視覺標註
+    state.answers.forEach((correctIdx, qIdx) => {
+        const userIdx = state.userSelect[qIdx]; // 讀取使用者選取的索引
+        const group = document.getElementById(`options-group-${qIdx}`);
         const explainDiv = document.getElementById(`explain-${qIdx}`);
+        
+        // 顯示解析區塊 (物理展開)
+        if (explainDiv) {
+            explainDiv.style.display = "block";
+        }
 
-        if (explainDiv) explainDiv.style.display = "block";
-
-        if (selected) {
-            const userIdx = parseInt(selected.value);
-            if (userIdx === correctIdx) {
-                score++;
-                questionBlockStyle(questionDiv, "#34A853", "#e6f4ea");
-                
-                // 🔥 【物理吸血邏輯】實裝
-                if (hasScepter) {
-                    const healAmount = Math.floor(player.maxHp * 0.05); // 每對一題回 5%
-                    player.currentHp = Math.min(player.maxHp, player.currentHp + healAmount);
-                    
-                    // 觸發 UI 上的綠色治癒光暈
-                    const hpText = document.getElementById('hero-hp-text');
-                    if (hpText) {
-                        hpText.style.transition = "none";
-                        hpText.style.textShadow = "0 0 10px #2ecc71";
-                        setTimeout(() => hpText.style.textShadow = "none", 500);
-                    }
-                    console.log(`🩸 權杖吸血：物理回復了 ${healAmount} HP`);
+        if (group) {
+            const btns = group.querySelectorAll('.quiz-opt-btn');
+            
+            // A. 物理修正：標記正確答案 (永遠顯示綠色 ✅)
+            if (btns[correctIdx]) {
+                btns[correctIdx].classList.add('correct');
+                btns[correctIdx].classList.remove('selected');
+                if(!btns[correctIdx].innerHTML.includes('✅')) {
+                    btns[correctIdx].innerHTML += ' <span style="float:right;">✅</span>';
                 }
-            } else {
-                questionBlockStyle(questionDiv, "#d9534f", "#fce8e6");
             }
-        } else {
-            if (questionDiv) {
-                questionDiv.style.borderColor = "#ccc";
-                questionDiv.style.background = "#f9f9f9";
+
+            // B. 判定對錯並執行神話效果
+            if (userIdx !== undefined) {
+                if (Number(userIdx) === Number(correctIdx)) {
+                    score++; // 物理增量
+                    
+                    // 🩸 【物理吸血邏輯】
+                    if (hasScepter) {
+                        const healAmount = Math.floor(player.maxHp * 0.05); // 吸取 5% 最大血量
+                        const oldHp = player.currentHp;
+                        player.currentHp = Math.min(player.maxHp, player.currentHp + healAmount);
+                        
+                        // 觸發 UI 綠色治癒特效
+                        const hpText = document.getElementById('hero-hp-text');
+                        if (hpText) {
+                            hpText.style.transition = "none";
+                            hpText.style.textShadow = "0 0 15px #2ecc71";
+                            setTimeout(() => { hpText.style.textShadow = "none"; }, 500);
+                        }
+                        console.log(`%c🩸 權杖共鳴：物理吸取 ${player.currentHp - oldHp} HP`, "color: #9b59b6;");
+                    }
+                } else {
+                    // 答錯：將使用者點選的項標記為紅色 ❌
+                    if (btns[userIdx]) {
+                        btns[userIdx].classList.add('wrong');
+                        btns[userIdx].classList.remove('selected');
+                        if(!btns[userIdx].innerHTML.includes('❌')) {
+                            btns[userIdx].innerHTML += ' <span style="float:right;">❌</span>';
+                        }
+                    }
+                }
             }
+            
+            // C. 物理回收權限：禁止此題的所有按鈕再次被點擊
+            btns.forEach(btn => {
+                btn.onclick = null;
+                btn.style.cursor = "default";
+            });
         }
     });
 
-    // --- 🎮 戰鬥行為與神話效果觸發 ---
+    // --- 4. 🎮 物理事件觸發鏈 ---
     if (score > 0) {
-        // 1. 觸發標準物理攻擊動畫
+        // A. 物理突進攻擊動畫
         if (typeof triggerHeroAttack === 'function') triggerHeroAttack();
 
-        // 2. 🔥 【物理處決判定】(🗡️ 統治者之鋒)
-        // 若持有利刃，10% 機率直接將得分物理拉滿至 Total
+        // B. 🔥 【物理處決判定】(🗡️ 統治者之鋒)
         if (hasBlade && Math.random() < 0.10) {
-            score = total;
-            showNotification("🗡️ <b style='color:#e74c3c;'>【處決】</b> 統治者之鋒斬斷了試煉，物理性全數擊破！");
+            score = total; // 強制將戰果同步至滿分
+            if (typeof showNotification === 'function') {
+                showNotification("🗡️ <b style='color:#e74c3c;'>【處決】</b> 統治者之鋒斬斷了試煉，物理全數擊破！");
+            }
             if (typeof triggerCheatShatterEffect === 'function') triggerCheatShatterEffect();
         }
 
-        // 3. 🔥 【物理視覺連動】(💀 審判者的血腥權杖)
+        // C. 🔥 【物理視覺連動】(💀 審判者的血腥權杖)
         if (hasScepter) {
-            triggerScepterVfx(); // 物理噴發紫色煙霧濾鏡
-            showNotification("💀 <b style='color:#9b59b6;'>【審判】</b> 權杖正在物理奪取魔物的生命精華...");
+            if (typeof triggerScepterVfx === 'function') triggerScepterVfx(); // 觸發紫色吸魂濾鏡
+            if (typeof showNotification === 'function') {
+                showNotification("💀 <b style='color:#9b59b6;'>【審判】</b> 權杖正在物理奪取魔物的生命精華...");
+            }
         }
     }
 
-    // --- 🎮 執行 RPG 數據結算 ---
-    battleReward(score, total, bossName);
+    // --- 5. 🎮 RPG 經濟與經驗結算 ---
+    if (typeof battleReward === 'function') {
+        // 進入王國經濟清算與經驗值注入流程
+        battleReward(score, total, bossName);
+    }
 
-    // 物理回饋與同步
-    updatePlayerUI(); 
+    // 數據物理同步與存檔鎖定
+    if (typeof updatePlayerUI === 'function') updatePlayerUI();
+    if (typeof savePlayerToDB === 'function') savePlayerToDB(); 
     
-    const feedback = score === total ? "✨ 素晴らしい！擊敗了強敵！" : `戰鬥結束！得分：${score}/${total}`;
-    alert(feedback);
+    // 6. 🔥 【終極回饋】顯示結果通知與導向
+    const scorePercent = Math.round((score / total) * 100);
+    let feedbackMsg = `📊 測驗結束！得分：${score} / ${total}`;
+    
+    if (scorePercent === 100) {
+        feedbackMsg = "✨ 素晴らしい！全問正解！(Perfect)";
+    } else if (scorePercent < 60) {
+        feedbackMsg = "💪 再加油！請參考下方的【物理解析】進行複習。";
+    }
+
+    if (typeof showNotification === 'function') {
+        showNotification(feedbackMsg);
+    } else {
+        alert(feedbackMsg);
+    }
+    
+    // 物理導正：平滑捲動至測驗區頂部，確保解析內容在視野範圍內
+    const quizSection = document.getElementById('quiz-section');
+    if (quizSection) {
+        quizSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 /**
@@ -15861,22 +16405,36 @@ async function renderHistoryList() {
 
 // --- 4. 點擊歷史紀錄載入與情報更新 (模組化修正版) ---
 async function loadHistory(id) {
+    // 1. 物理讀取：從資料庫獲取完整燃料包
     const data = await db.fuelPacks.get(id);
     if (!data) return;
 
-    // A. 物理執行文章顯示
-    displayContent(data);
+    // 2. 🔥 【核心呼叫】使用新版動態渲染引擎顯示內容 (文章、單字、測驗)
+    // 這會自動生成中間白色區域的所有 HTML
+    if (typeof renderLearningDetail === 'function') {
+        renderLearningDetail(data);
+    } else {
+        console.error("❌ 找不到 renderLearningDetail，無法渲染學習內容！");
+    }
     
-    // B. 更新情報面板 (Intel Panel) - 🔥 改為呼叫共用函數
-    // 該函數內部已包含 window.currentActivePack 的鎖定邏輯
+    // 3. 更新情報面板 (Intel Panel) & 物理鎖定目標
+    // 這會更新側邊欄的怪物數值與掉落物預覽
     if (typeof updateIntelPanel === 'function') {
         updateIntelPanel(data);
     } else {
         console.warn("⚠️ updateIntelPanel 尚未定義，側邊欄情報可能未更新");
     }
 
-    // C. 物理平滑置頂，讓玩家從頭開始閱讀
+    // 4. 物理平滑置頂 (UX 優化)
+    // 優先捲動「學習內容容器」，確保長文章切換時回到頂部
+    const contentArea = document.getElementById('learning-content-area');
+    if (contentArea) {
+        contentArea.scrollTop = 0;
+    }
+    // 備用：捲動整個視窗
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    console.log(`📖 已載入歷史章節：${data.name}`);
 }
 
 
@@ -15893,14 +16451,85 @@ function triggerEncounterFromIntel() {
     }
 }
 
-    // --- 6. 語音與 UI 控制邏輯 ---
-    function speakTextFromId(id) {
-        const el = document.getElementById(id);
-        const temp = document.createElement('div');
-        temp.innerHTML = el.innerHTML;
-        temp.querySelectorAll('rt').forEach(rt => rt.remove());
-        speakRawText(temp.innerText);
+// --- 6. 語音與 UI 控制邏輯 (防重讀修正版) ---
+
+/**
+ * 🗣️ 核心發聲引擎 (V3: 防重讀 + 年輕女聲版)
+ * 特性：
+ * 1. 物理移除 <rt> 標籤內的假名，解決「漢字+假名」導致唸兩次的問題。
+ * 2. 自動搜尋年輕女聲並微調音調。
+ * * @param {string} text - 要朗讀的文字 (可以是純文字或含 ruby 的 HTML)
+ */
+function speakText(text) {
+    if (!text) return;
+
+    // 1. 物理打斷
+    window.speechSynthesis.cancel();
+
+    // 2. 🔥【核心修正】DOM 物理過濾
+    // 建立一個隱形的暫存元素來解析 HTML
+    const temp = document.createElement('div');
+    temp.innerHTML = text;
+
+    // 🔪 手術刀：精準切除所有 <rt> (假名) 元素
+    // 這樣 <ruby>漢<rt>かん</rt></ruby> 就會只剩下 "漢"
+    temp.querySelectorAll('rt').forEach(rt => rt.remove());
+
+    // 取出乾淨的純文字
+    const cleanText = temp.innerText.trim();
+
+    if (!cleanText) return; // 如果切完沒東西就不唸
+
+    // 3. 建立語音物件
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'ja-JP';
+    
+    // 4. 聲音獵人：尋找最佳女聲
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoices = [
+        "Google 日本語",      
+        "Microsoft Haruka",   
+        "Microsoft Ayumi",    
+        "Kyoko",              
+        "O-Ren"               
+    ];
+
+    let selectedVoice = null;
+    for (const name of preferredVoices) {
+        selectedVoice = voices.find(v => v.name.includes(name));
+        if (selectedVoice) break;
     }
+    if (!selectedVoice) selectedVoice = voices.find(v => v.lang === 'ja-JP');
+
+    // 5. 物理掛載與調教
+    if (selectedVoice) {
+        utterance.voice = selectedVoice;
+        utterance.pitch = 1.1; // 年輕化音調
+        console.log(`🎤 使用聲優: ${selectedVoice.name} | 內容: ${cleanText}`);
+    }
+
+    // 6. 讀取語速
+    const speedRange = document.getElementById('speed-range');
+    utterance.rate = speedRange ? parseFloat(speedRange.value) : 1.0;
+
+    // 7. 執行
+    window.speechSynthesis.speak(utterance);
+}
+
+/**
+ * 📖 文章專用朗讀器 (簡化版)
+ * 因為核心引擎 speakText 已經會處理 <rt> 移除，這裡只要負責抓取 HTML 即可
+ * @param {string} id - 文章容器的 ID
+ */
+function speakTextFromId(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    
+    // 直接把包含 HTML 的內容丟給核心引擎，讓它去負責切除 <rt>
+    speakText(el.innerHTML);
+}
+
+
 
     function speakRawText(text) {
         window.speechSynthesis.cancel();
