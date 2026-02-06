@@ -2222,7 +2222,6 @@ html {
     pointer-events: none; /* 物理穿透 */
 }
 
-
 /* =========================================
    📱 手機端物理歸一化 (Mobile Normalization)
    ========================================= */
@@ -2291,6 +2290,77 @@ html {
         height: 70px !important;
     }
 }
+
+
+
+/* 1. ⚡ 全量響應式防禦：針對手機 Chrome/Safari 優化 [cite: 2026-02-06] */
+    @media screen and (max-width: 767px) {
+        :root {
+            --mobile-nav-h: 70px;
+        }
+
+        /* 強制單欄佈局，防止內容擠壓 [cite: 2026-02-05] */
+        .main-wrapper {
+            grid-template-columns: 1fr !important;
+            margin-top: 180px !important;
+            padding: 0 10px 80px 10px !important;
+        }
+
+        /* 雲端登入按鈕：物理重定位至螢幕中央偏上，防止被遮擋 [cite: 2026-02-06] */
+        #g_id_onload, .g_id_signin {
+            position: fixed !important;
+            top: 20px !important;
+            right: 10px !important;
+            z-index: 10000 !important;
+        }
+
+        /* 大老二牌桌：垂直空間解放 [cite: 2026-02-06] */
+        #poker-table {
+            height: calc(100dvh - var(--mobile-nav-h)) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            padding: 5px !important;
+            overscroll-behavior: contain; /* 禁止下拉刷新 */
+        }
+
+        /* AI 區縮小與位移 */
+        .ai-opponents-row {
+            transform: scale(0.8) !important;
+            margin-top: -10px !important;
+        }
+
+        /* 手牌區：橫向捲動防禦，防止卡片重疊 [cite: 2026-02-06] */
+        #player-hand-container {
+            overflow-x: auto !important;
+            white-space: nowrap !important;
+            padding: 10px 0 30px 0 !important;
+            justify-content: flex-start !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .poker-card {
+            flex-shrink: 0 !important;
+            margin-right: -15px !important; /* 物理重疊度修正 */
+        }
+
+        /* 控制按鈕：放大並定位於大拇指熱區 [cite: 2026-02-06] */
+        #player-command-dock {
+            bottom: 80px !important;
+            transform: scale(1.1) !important;
+        }
+
+        /* 彈窗：底部抽屜化 [cite: 2026-02-06] */
+        .game-popup {
+            width: 100% !important;
+            height: 85dvh !important;
+            top: auto !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            transform: translateY(0) !important;
+            border-radius: 25px 25px 0 0 !important;
+        }
+    }
 
 </style>
 
@@ -3114,58 +3184,82 @@ window.getItemStats = function(itemName) {
 
 
 /**
- * 📊 物理子程序：全域戰鬥屬性結算 (V5.9.39 成長基底版)
- * 修正：
- * 1. 基礎屬性 = 等級 (Level)
- * 2. 最終屬性 = 等級 + 配點
+ * 📊 物理子程序：全域戰鬥屬性結算 (V5.9.58 比例鎖定版)
+ * 修正內容：
+ * 1. 物理水位鎖定：更換裝備時保持 HP 百分比，防止反噬扣血 [cite: 2026-02-06]
+ * 2. 數值類型防禦：強制轉型 Number，防止 Level 100+ 產生 NaN 崩潰 [cite: 2026-02-06]
+ * 3. 基礎與成長分流：等級作為基底，配點作為增幅。
  */
 window.calculateCombatStats = function() {
-    // 0. 數據防禦
+    // --- 🟢 0. 物理水位記錄 (HP Ratio Lock) ---
+    // 在屬性變更前，先鎖定當前血量百分比，防止因 MaxHP 提升而產生的水位落差 [cite: 2026-02-06]
+    const currentMaxHp = player.maxHp || 1;
+    const hpRatio = Math.min(1, player.currentHp / currentMaxHp);
+
+    // --- 🟢 1. 數據防禦與基底初始化 ---
     const attr = player.attributes || { str: 0, sta: 0, agi: 0, int: 0, block: 0, eva: 0, p_eva: 0 };
-    const baseVal = player.lv || 1; // 🔥 核心：每級給予 1 點全屬性基底
+    const baseVal = Number(player.lv) || 1; // 強制轉型為數字，防禦手機端數據偏移 [cite: 2026-02-06]
 
-    // 1. 計算總屬性 (Total Stats)
-    const totalStr = baseVal + (attr.str || 0);
-    const totalSta = baseVal + (attr.sta || 0);
-    const totalAgi = baseVal + (attr.agi || 0);
-    const totalInt = baseVal + (attr.int || 0);
+    // 基礎屬性 = 等級 (Level) + 配點 (Added)
+    const totalStr = baseVal + (Number(attr.str) || 0);
+    const totalSta = baseVal + (Number(attr.sta) || 0);
+    const totalAgi = baseVal + (Number(attr.agi) || 0);
+    const totalInt = baseVal + (Number(attr.int) || 0);
 
-    // 2. 遍歷裝備累加基礎數值
+    // --- 🟢 2. 遍歷裝備累加 (防禦 V5.9.42 結構) ---
     let equipBaseDef = 0;
     let equipBaseAtk = 0;
     if (player.equips) {
         Object.values(player.equips).forEach(itemName => {
-            if (itemName) {
+            if (itemName && typeof getItemStats === 'function') {
                 const s = getItemStats(itemName);
-                equipBaseDef += s.def;
-                equipBaseAtk += s.atk;
+                if (s) {
+                    equipBaseDef += (s.def || 0);
+                    equipBaseAtk += (s.atk || 0);
+                }
             }
         });
     }
 
-    // 3. 🛡️ 物理防禦演算
+    // --- 🟢 3. 🛡️ 物理防禦演算 ---
     // 體力加成：每 1 點體力 +2 防
     // 力量加成：每 1 點力量 +0.5% 總防
     const baseDefTotal = equipBaseDef + (totalSta * 2);
     const strBonus = 1 + (totalStr * 0.005); 
     const finalDefPoints = Math.floor(baseDefTotal * strBonus);
 
-    // 4. ⚔️ 物理攻擊演算
+    // --- 🟢 4. ⚔️ 物理攻擊演算 ---
     // 每 1 點力量 +1% 總攻
-    const baseAtkTotal = player.lv + equipBaseAtk;
+    const baseAtkTotal = baseVal + equipBaseAtk;
     const finalAtkPoints = Math.floor(baseAtkTotal * (1 + totalStr * 0.01));
 
-    // 5. 衍生數值
-    const physicalResistance = finalDefPoints * 0.005; // 傷減率
-    const evaRate = (totalAgi * 0.005) + (attr.eva * 0.01);
-    
-    // 完全迴避：格擋 + (總敏捷轉換) + 額外點數
-    const perfectDodgeRate = (attr.block * 0.015) + (evaRate * 0.2) + (attr.p_eva * 0.01);
+    // --- 🟢 5. 衍生數值演算 ---
+    // 傷減率：上限鎖定為 90%
+    const physicalResistance = finalDefPoints * 0.005; 
+    // 基礎迴避率
+    const evaRate = (totalAgi * 0.005) + ((Number(attr.eva) || 0) * 0.01);
+    // 完全迴避 (Perfect Dodge)：上限鎖定為 80% [cite: 2026-01-21]
+    const perfectDodgeRate = ((Number(attr.block) || 0) * 0.015) + (evaRate * 0.2) + ((Number(attr.p_eva) || 0) * 0.01);
+    // 異常抵抗
     const statusResist = totalInt * 5;
 
+    // --- 🟢 6. 🕒 物理水位同步 (HP Ratio Restore) ---
+    // 重新計算 MaxHP 並根據比例還原 CurrentHP [cite: 2026-02-06]
+    // 血量公式：50 + (等級 * 10) + (體力 * 5)
+    const newMaxHp = 50 + (baseVal * 10) + (totalSta * 5);
+    player.maxHp = newMaxHp;
+    
+    // 只有在非死亡狀態下執行比例同步，確保穿裝備不會「扣血」 [cite: 2026-02-06]
+    if (player.currentHp > 0) {
+        player.currentHp = Math.max(1, Math.floor(newMaxHp * hpRatio));
+    }
+
     return {
-        // 顯示面板用
-        str: totalStr, sta: totalSta, agi: totalAgi, int: totalInt,
+        // 顯示面板用 (對齊 image_68ae0b.png)
+        str: totalStr, 
+        sta: totalSta, 
+        agi: totalAgi, 
+        int: totalInt,
         
         // 戰鬥演算用
         defPoints: finalDefPoints,
@@ -3174,8 +3268,8 @@ window.calculateCombatStats = function() {
         perfectDodge: Math.min(0.8, perfectDodgeRate), 
         specResist: statusResist,
         
-        // 剩餘點數：(等級 * 3) - 已分配 (不含基底)
-        remainingPoints: (player.lv * 3) - ((attr.str||0) + (attr.sta||0) + (attr.agi||0) + (attr.int||0))
+        // 剩餘點數計算
+        remainingPoints: (baseVal * 3) - ((Number(attr.str)||0) + (Number(attr.sta)||0) + (Number(attr.agi)||0) + (Number(attr.int)||0))
     };
 };
 
@@ -6337,7 +6431,7 @@ function drawAttributesTabView(container, headerHTML) {
                 <div style="font-size:9px; color:#666; margin-top:4px;">LV.${player.lv} (每級+3點 / 全屬性基底+${player.lv})</div>
             </div>
 
-            <div class="attributes-grid-mobile" style="display:grid; grid-template-columns: 1fr; gap:10px; margin-bottom:25px;">
+            <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:25px;">
                 ${['str', 'sta', 'agi', 'int'].map(k => {
                     const labelMap = {str:'力量 (STR)', sta:'體力 (STA)', agi:'敏捷 (AGI)', int:'智力 (INT)'};
                     const colorMap = {str:'#e74c3c', sta:'#2ecc71', agi:'#f1c40f', int:'#9b59b6'};
@@ -20441,33 +20535,61 @@ window.onload = async function() {
     <button class="btn-nhk" style="background:#f1c40f; color:#000; border:none; padding:10px 40px; border-radius:30px;" onclick="closeVictory()">確認 (OK)</button>
 </div>
 
-<div id="mobile-bottom-nav" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: rgba(20,20,25,0.98); border-top: 2px solid #333; z-index: 5000; padding: 5px 10px; backdrop-filter: blur(10px);">
-    <div style="display: flex; justify-content: space-around; align-items: center; height: 100%;">
-        <div onclick="toggleMenu('equipment')" style="text-align:center; color:#f1c40f;">
-            <div style="font-size:24px;">🛡️</div>
+<div id="mobile-bottom-nav" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: rgba(20,20,25,0.98); border-top: 2px solid #444; z-index: 5000; padding: 5px 0; backdrop-filter: blur(20px);">
+    <div style="display: flex; justify-content: space-between; align-items: center; height: 100%; width: 100%;">
+        
+        <div onclick="shiftMobileMenu(-1)" style="flex: 1.2; text-align:center; color:#777; border-right: 1px solid #333; height: 80%; display: flex; align-items: center; justify-content: center;">
+            <div style="font-size:22px;">◀</div>
+        </div>
+
+        <div onclick="toggleMenu('equipment')" style="flex: 2; text-align:center; color:#f1c40f;">
+            <div style="font-size:20px;">⚔️</div>
             <div style="font-size:9px; font-weight:bold;">裝備</div>
         </div>
-        <div onclick="toggleMenu('inventory')" style="text-align:center; color:#fff;">
-            <div style="font-size:24px;">🎒</div>
+
+        <div onclick="toggleMenu('inventory')" style="flex: 2; text-align:center; color:#fff;">
+            <div style="font-size:20px;">🎒</div>
             <div style="font-size:9px; font-weight:bold;">背包</div>
         </div>
-        <div onclick="toggleMenu('map')" style="text-align:center; color:#fff;">
-            <div style="font-size:24px;">🗺️</div>
+
+        <div onclick="toggleMenu('collection')" style="flex: 2; text-align:center; color:#fff;">
+            <div style="font-size:20px;">💎</div>
+            <div style="font-size:9px; font-weight:bold;">圖鑑</div>
+        </div>
+
+        <div onclick="toggleMenu('alchemy')" style="flex: 2; text-align:center; color:#fff;">
+            <div style="font-size:20px;">🔮</div>
+            <div style="font-size:9px; font-weight:bold;">鍊金</div>
+        </div>
+
+        <div onclick="toggleMenu('map')" style="flex: 2; text-align:center; color:#fff;">
+            <div style="font-size:20px;">🗺️</div>
             <div style="font-size:9px; font-weight:bold;">地圖</div>
         </div>
-        <div onclick="window.switchEquipTab('stats')" style="text-align:center; color:#fff;">
-            <div style="font-size:24px;">📊</div>
+
+        <div onclick="window.switchEquipTab('stats')" style="flex: 2; text-align:center; color:#fff;">
+            <div style="font-size:20px;">📊</div>
             <div style="font-size:9px; font-weight:bold;">素質</div>
+        </div>
+
+        <div onclick="shiftMobileMenu(1)" style="flex: 1.2; text-align:center; color:#777; border-left: 1px solid #333; height: 80%; display: flex; align-items: center; justify-content: center;">
+            <div style="font-size:22px;">▶</div>
         </div>
     </div>
 </div>
 
 <style>
-    /* 物理條件顯示：僅在手機版出現 */
+    /* 📱 移動端專屬佈局防禦 [cite: 2026-02-05] */
     @media screen and (max-width: 767px) {
         #mobile-bottom-nav { display: block !important; }
-        /* 確保主內容底部不被導航列遮擋 */
-        body { padding-bottom: 70px !important; }
+        /* 為底部控制列預留物理安全空間 [cite: 2026-02-06] */
+        body { padding-bottom: 95px !important; }
+        
+        /* 視覺反饋：點擊瞬間變亮 [cite: 2026-01-19] */
+        #mobile-bottom-nav div:active {
+            background: rgba(255,255,255,0.1);
+            transition: 0.05s;
+        }
     }
 </style>
 
