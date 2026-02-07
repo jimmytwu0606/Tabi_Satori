@@ -20665,6 +20665,69 @@ window.onload = async function() {
     }
 }
 
+/* =========================================
+   📱 手機版：全景視角與渲染加固 (V5.9.66)
+   ========================================= */
+@media screen and (max-width: 767px) {
+    /* 1. 全域縮放：解決畫面過大與組件重疊 */
+    #game-container, #poker-layout-wrapper {
+        transform: scale(0.75) !important;
+        transform-origin: top center !important;
+        width: 133.3% !important; /* 補償係數 (1 / 0.75) */
+        height: 100dvh !important;
+        position: fixed !important;
+        top: 0;
+        left: -16.6% !important; /* 物理居中 */
+        overflow: hidden !important;
+    }
+
+    /* 2. 渲染修復：解決卡片顯示不全與閃爍 */
+    .poker-card, .enemy-sprite, .battle-effect {
+        will-change: transform;
+        transform: translateZ(0) !important; /* 強制 GPU 物理渲染 */
+        -webkit-backface-visibility: hidden;
+    }
+
+    /* 3. 功能列優化：調整間距防止溢出 */
+    #mobile-bottom-nav {
+        height: 70px !important;
+        transform: scale(1) !important; /* 功能列不縮放以利點擊 */
+        width: 100% !important;
+        left: 0 !important;
+    }
+}
+
+/* =========================================
+   📱 手機版選單物理回歸補丁 (V5.9.67)
+   ========================================= */
+@media screen and (max-width: 767px) {
+    /* 1. 確保導航列物理置頂：無視任何 scale 縮放 */
+    #mobile-bottom-nav {
+        display: flex !important; /* 強制啟動 */
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 75px !important;
+        z-index: 250000 !important; /* 物理層級：必須高於所有縮放圖層與彈窗 */
+        background: rgba(15, 15, 20, 0.98) !important;
+        transform: none !important; /* 🔥 絕對禁止受父層縮放影響 */
+        backdrop-filter: blur(15px) !important;
+        border-top: 1px solid #444 !important;
+        padding-bottom: env(safe-area-inset-bottom) !important; /* 適配 iOS 底部橫條 */
+    }
+
+    /* 2. 修正主內容區的物理間距，防止內容沉底被選單擋住 */
+    body {
+        padding-bottom: 95px !important; 
+    }
+
+    /* 3. 當彈窗（底部抽屜）開啟時，確保它不會蓋過導航列 */
+    .game-popup {
+        bottom: 75px !important; /* 物理避讓：將彈窗推至導航列上方 */
+        height: calc(100dvh - 75px) !important;
+    }
+}
 
 </style>
 
