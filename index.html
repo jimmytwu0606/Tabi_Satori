@@ -20457,6 +20457,39 @@ function updateProgress(current, total) {
 }
 
 /**
+ * 🛰️ 物理子程序：王國入場環境淨化 (解決重疊與生怪問題)
+ */
+async function initiateKingdomEntry() {
+    console.log("🚫 執行物理隔離：清除背景冒險引擎...");
+
+    // 1. 徹底熄滅生怪計時器，終結「一直跑怪出來」的 Bug
+    if (typeof stopEnemyLoop === 'function') stopEnemyLoop();
+    
+    // 2. 物理強制關閉地圖、傳送門與所有彈窗
+    const popups = ['adventure-map-popup', 'equipment-popup', 'inventory-popup', 'collection-popup', 'alchemy-popup'];
+    popups.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+
+    // 3. 移除畫面殘留的怪物 DOM 節點
+    document.querySelectorAll('.enemy-sprite, .battle-effect').forEach(e => e.remove());
+
+    // 4. 強制解除「核對身分」死鎖 (設定 3 秒安全逾時)
+    setTimeout(() => {
+        const loading = document.getElementById('loading-overlay');
+        if (loading && loading.style.display !== 'none') {
+            console.warn("⚠️ 雲端核對超時，強制點火進入牌局。");
+            if (typeof startKingdomRotationLogic === 'function') startKingdomRotationLogic();
+        }
+    }, 3000);
+
+    // 啟動轉盤
+    startKingdomRotationLogic();
+}
+
+
+/**
  * 🚀 全系統唯一物理啟動鏈：整合資料庫、王國經濟、屬性矩陣與雲端同步
  * 修正：
  * 1. 結構先行：在執行 loadPlayerFromDB 前預埋屬性與腰帶結構，防止渲染空值。 [cite: 2026-02-06]
@@ -20806,6 +20839,47 @@ window.onload = async function() {
     /* 3. 調整圖標尺寸防止 6 按鈕擠壓 */
     #mobile-bottom-nav div {
         line-height: 1.2 !important;
+    }
+}
+
+/* =========================================
+   📱 手機版：全景視角與渲染加固 (V5.9.67)
+   ========================================= */
+@media screen and (max-width: 767px) {
+    /* 1. 全域縮放：解決最後一張截圖顯示的 UI 斷裂問題 */
+    #game-container, #poker-layout-wrapper {
+        transform: scale(0.75) !important;
+        transform-origin: top center !important;
+        width: 133.3% !important; /* 物理補償寬度 (1/0.75) */
+        height: 100dvh !important;
+        position: fixed !important;
+        top: 0;
+        left: -16.6% !important;
+        overflow: hidden !important;
+        background: #000; /* 背景刷黑，解決渲染不全產生的白邊 */
+    }
+
+    /* 2. 手牌物理佈局：將九宮格手牌改為可捲動行，防止遮擋 ACT 按鈕 */
+    #player-hand {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        padding-bottom: 20px !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .poker-card {
+        flex: 0 0 65px !important; /* 固定牌寬，防止擠壓變形 */
+        margin-right: -10px !important;
+        transform: translateZ(0); /* 點火 GPU 渲染 */
+    }
+
+    /* 3. 功能導航列：修正左右箭頭間距，防止誤觸系統手勢 */
+    #mobile-bottom-nav {
+        height: 75px !important;
+        padding-bottom: env(safe-area-inset-bottom, 10px) !important;
+        transform: scale(1) !important;
+        z-index: 10001 !important; /* 確保在所有彈窗之上 */
     }
 }
 
