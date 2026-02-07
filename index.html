@@ -20586,45 +20586,45 @@ window.onload = async function() {
     <button class="btn-nhk" style="background:#f1c40f; color:#000; border:none; padding:10px 40px; border-radius:30px;" onclick="closeVictory()">確認 (OK)</button>
 </div>
 
-<div id="mobile-bottom-nav" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: rgba(20,20,25,0.98); border-top: 2px solid #444; z-index: 5000; padding: 5px 0; backdrop-filter: blur(20px);">
+<div id="mobile-bottom-nav" style="display: none;">
     <div style="display: flex; justify-content: space-between; align-items: center; height: 100%; width: 100%;">
         
         <div onclick="shiftMobileMenu(-1)" style="flex: 1.2; text-align:center; color:#777; border-right: 1px solid #333; height: 80%; display: flex; align-items: center; justify-content: center;">
-            <div style="font-size:22px;">◀</div>
+            <div style="font-size:20px;">◀</div>
         </div>
 
         <div onclick="toggleMenu('equipment')" style="flex: 2; text-align:center; color:#f1c40f;">
-            <div style="font-size:20px;">⚔️</div>
+            <div style="font-size:18px;">⚔️</div>
             <div style="font-size:9px; font-weight:bold;">裝備</div>
         </div>
 
         <div onclick="toggleMenu('inventory')" style="flex: 2; text-align:center; color:#fff;">
-            <div style="font-size:20px;">🎒</div>
+            <div style="font-size:18px;">🎒</div>
             <div style="font-size:9px; font-weight:bold;">背包</div>
         </div>
 
         <div onclick="toggleMenu('collection')" style="flex: 2; text-align:center; color:#fff;">
-            <div style="font-size:20px;">💎</div>
+            <div style="font-size:18px;">💎</div>
             <div style="font-size:9px; font-weight:bold;">圖鑑</div>
         </div>
 
         <div onclick="toggleMenu('alchemy')" style="flex: 2; text-align:center; color:#fff;">
-            <div style="font-size:20px;">🔮</div>
+            <div style="font-size:18px;">🔮</div>
             <div style="font-size:9px; font-weight:bold;">鍊金</div>
         </div>
 
         <div onclick="toggleMenu('map')" style="flex: 2; text-align:center; color:#fff;">
-            <div style="font-size:20px;">🗺️</div>
+            <div style="font-size:18px;">🗺️</div>
             <div style="font-size:9px; font-weight:bold;">地圖</div>
         </div>
 
         <div onclick="window.switchEquipTab('stats')" style="flex: 2; text-align:center; color:#fff;">
-            <div style="font-size:20px;">📊</div>
+            <div style="font-size:18px;">📊</div>
             <div style="font-size:9px; font-weight:bold;">素質</div>
         </div>
 
         <div onclick="shiftMobileMenu(1)" style="flex: 1.2; text-align:center; color:#777; border-left: 1px solid #333; height: 80%; display: flex; align-items: center; justify-content: center;">
-            <div style="font-size:22px;">▶</div>
+            <div style="font-size:20px;">▶</div>
         </div>
     </div>
 </div>
@@ -20726,6 +20726,86 @@ window.onload = async function() {
     .game-popup {
         bottom: 75px !important; /* 物理避讓：將彈窗推至導航列上方 */
         height: calc(100dvh - 75px) !important;
+    }
+}
+
+/* =========================================
+   🍎 iOS 物理渲染導正層 (V5.9.69)
+   ========================================= */
+@media screen and (max-width: 767px) {
+    #mobile-bottom-nav {
+        /* 1. 強制脫離縮放上下文 */
+        display: flex !important;
+        position: fixed !important;
+        /* iOS 必須鎖定 bottom: 0，並用 padding 避讓 Home Bar */
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        
+        /* 2. 物理高度補償：為了放 6 個按鈕，高度微調為 80px */
+        height: 80px !important;
+        padding-bottom: env(safe-area-inset-bottom, 20px) !important;
+        
+        /* 3. iOS 層級突圍：使用 translateZ 強迫 GPU 分層 */
+        z-index: 2147483647 !important; /* 物理最大值 */
+        -webkit-transform: translateZ(999px) scale(1) !important;
+        transform: translateZ(999px) scale(1) !important;
+        
+        background: #141419 !important;
+        border-top: 1px solid #444 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    /* 4. 防止主戰場縮放後遮擋底部：強制主畫布下沈 */
+    #game-container, #poker-layout-wrapper {
+        /* iOS 下縮放必須配合百分比位移修正 */
+        -webkit-transform: scale(0.75) translateY(-15%) !important;
+        transform: scale(0.75) translateY(-15%) !important;
+        height: 100dvh !important;
+        /* 物理裁切：確保戰場不會溢出到選單下方 */
+        margin-bottom: 80px !important;
+    }
+}
+
+/* =========================================
+   🍎 iOS 物理渲染絕對導正層
+   ========================================= */
+@media screen and (max-width: 767px) {
+    /* 1. 選單強制浮出：物理最大化層級 */
+    #mobile-bottom-nav {
+        display: flex !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 80px !important; /* 增加物理高度以容納 iOS Home Bar */
+        background: rgba(15, 15, 20, 0.98) !important;
+        border-top: 2px solid #444 !important;
+        
+        /* 🔥 關鍵：iOS GPU 專屬分層指令 */
+        z-index: 2147483647 !important; 
+        -webkit-transform: translateZ(9999px) scale(1) !important;
+        transform: translateZ(9999px) scale(1) !important;
+        
+        padding-bottom: env(safe-area-inset-bottom, 15px) !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* 2. 主畫布物理偏移修正：避免縮放後壓住選單 */
+    #game-container, #poker-layout-wrapper {
+        /* 在 iOS 縮放 0.75 時，必須手動補償 Y 軸位移，否則內容會下沉消失 */
+        -webkit-transform: scale(0.75) translateY(-12%) !important;
+        transform: scale(0.75) translateY(-12%) !important;
+        height: 100dvh !important;
+        margin-bottom: 80px !important;
+    }
+
+    /* 3. 調整圖標尺寸防止 6 按鈕擠壓 */
+    #mobile-bottom-nav div {
+        line-height: 1.2 !important;
     }
 }
 
